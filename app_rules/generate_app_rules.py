@@ -89,7 +89,7 @@ class GenerateRules:
 				# also ignore `float_identifiers` for backwards compatibility
 				Application(app["float_identifiers"], app["name"]).generate_rules()
 			else:
-				Application(app, [app["name"]]).generate_rules()
+				Application([app["identifier"]], app["name"]).generate_rules()
 
 
 class Application:
