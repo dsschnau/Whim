@@ -85,7 +85,11 @@ class GenerateRules:
 
 	def generate_all_rules(self):
 		for app in self.komorebi_rules:
-			Application(app["ignore_identifiers"], app["name"]).generate_rules()
+			if "float_identifiers" in app:
+				# also ignore `float_identifiers` for backwards compatibility
+				Application(app["float_identifiers"], app["name"]).generate_rules()
+			else:
+				Application(app, [app["name"]]).generate_rules()
 
 
 class Application:
