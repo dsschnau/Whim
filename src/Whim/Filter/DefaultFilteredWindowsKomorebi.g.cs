@@ -43,6 +43,12 @@ internal static class DefaultFilteredWindowsKomorebi
 		filterManager.Add((window) => (window.WindowClass.StartsWith("AbletonVstPlugClass") || window.WindowClass.EndsWith("AbletonVstPlugClass")));
 		filterManager.Add((window) => (window.WindowClass.StartsWith("Vst3PlugWindow") || window.WindowClass.EndsWith("Vst3PlugWindow")));
 
+		// Adobe Creative Cloud
+		filterManager.Add((window) => (window.WindowClass.StartsWith("CreativeCloudDesktopWindowClass") || window.WindowClass.EndsWith("CreativeCloudDesktopWindowClass")));
+
+		// Adobe Photoshop
+		filterManager.Add((window) => (window.WindowClass.StartsWith("Photoshop") || window.WindowClass.EndsWith("Photoshop")));
+
 		// Adobe Premiere Pro
 		filterManager.AddWindowClassFilter("DroverLord - Window Class");
 
@@ -55,8 +61,20 @@ internal static class DefaultFilteredWindowsKomorebi
 		// Affinity Publisher 2
 		filterManager.AddProcessFileNameFilter("Publisher.exe");
 
+		// Akiflow
+		filterManager.AddProcessFileNameFilter("Akiflow.exe");
+
 		// Amazon Chime
 		filterManager.Add((window) => window.Title.EndsWith("Meeting Controls"));
+
+		// Android Studio
+		filterManager.AddProcessFileNameFilter("studio64.exe");
+
+		// Anki
+		filterManager.AddProcessFileNameFilter("anki.exe");
+
+		// ArmCord
+		filterManager.AddProcessFileNameFilter("ArmCord.exe");
 
 		// AutoDesk AutoCAD Suite
 		filterManager.Add((window) => window.WindowClass.Contains("Afx:") && window.ProcessFileName.Equals("acad.exe"));
@@ -66,8 +84,20 @@ internal static class DefaultFilteredWindowsKomorebi
 		filterManager.Add((window) => window.Title.StartsWith("Window Spy"));
 		filterManager.AddProcessFileNameFilter("AutoHotkeyUX.exe");
 
+		// Beeper
+		filterManager.AddProcessFileNameFilter("Beeper.exe");
+
+		// Bitwarden
+		filterManager.AddProcessFileNameFilter("Bitwarden.exe");
+
+		// Blitz
+		filterManager.AddProcessFileNameFilter("Blitz.exe");
+
 		// Bloxstrap
 		filterManager.AddProcessFileNameFilter("Bloxstrap.exe");
+
+		// Brave Browser
+		filterManager.AddProcessFileNameFilter("brave.exe");
 
 		// CLion
 		filterManager.AddWindowClassFilter("SunAwtDialog");
@@ -78,21 +108,72 @@ internal static class DefaultFilteredWindowsKomorebi
 		// Citrix Receiver
 		filterManager.AddProcessFileNameFilter("SelfService.exe");
 
+		// Clash Verge
+		filterManager.AddProcessFileNameFilter("Clash Verge.exe");
+
+		// Clementine
+		filterManager.AddProcessFileNameFilter("clementine.exe");
+
+		// CopyQ
+		filterManager.AddProcessFileNameFilter("copyq.exe");
+
 		// Core Temp
 		filterManager.AddProcessFileNameFilter("Core Temp.exe");
 
 		// Credential Manager UI Host
 		filterManager.AddProcessFileNameFilter("CredentialUIBroker.exe");
 
+		// Cron
+		filterManager.AddProcessFileNameFilter("Cron.exe");
+
+		// DS4Windows
+		filterManager.AddProcessFileNameFilter("DS4Windows.exe");
+
+		// DataGrip
+		filterManager.AddProcessFileNameFilter("datagrip64.exe");
+
 		// Delphi applications
 		filterManager.Add((window) => (window.WindowClass.StartsWith("TApplication") || window.WindowClass.EndsWith("TApplication")));
 		filterManager.Add((window) => (window.WindowClass.StartsWith("TWizardForm") || window.WindowClass.EndsWith("TWizardForm")));
 
+		// Discord
+		filterManager.AddProcessFileNameFilter("Discord.exe");
+
+		// Discord Bot Client
+		filterManager.AddProcessFileNameFilter("DiscordBotClient.exe");
+
+		// DiscordCanary
+		filterManager.AddProcessFileNameFilter("DiscordCanary.exe");
+
+		// DiscordDevelopment
+		filterManager.AddProcessFileNameFilter("DiscordDevelopment.exe");
+
+		// DiscordPTB
+		filterManager.AddProcessFileNameFilter("DiscordPTB.exe");
+
+		// Docker Desktop
+		filterManager.AddProcessFileNameFilter("Docker Desktop.exe");
+
 		// Dropbox
 		filterManager.AddProcessFileNameFilter("Dropbox.exe");
 
+		// EA Desktop Client
+		filterManager.AddProcessFileNameFilter("EADesktop.exe");
+
+		// Eagle
+		filterManager.AddProcessFileNameFilter("Eagle.exe");
+
+		// ElectronMail
+		filterManager.AddProcessFileNameFilter("ElectronMail.exe");
+
+		// Element
+		filterManager.AddProcessFileNameFilter("Element.exe");
+
 		// Elephicon
 		filterManager.AddProcessFileNameFilter("Elephicon.exe");
+
+		// ElevenClock
+		filterManager.AddProcessFileNameFilter("ElevenClock.exe");
 
 		// Elgato Camera Hub
 		filterManager.AddProcessFileNameFilter("Camera Hub.exe");
@@ -103,11 +184,47 @@ internal static class DefaultFilteredWindowsKomorebi
 		// Elgato Wave Link
 		filterManager.AddProcessFileNameFilter("WaveLink.exe");
 
+		// Epic Games Launcher
+		filterManager.AddProcessFileNameFilter("EpicGamesLauncher.exe");
+
+		// Everything
+		filterManager.Add((window) => (window.WindowClass.StartsWith("EVERYTHING") || window.WindowClass.EndsWith("EVERYTHING")));
+
+		// Everything1.5a
+		filterManager.Add((window) => (window.WindowClass.StartsWith("EVERYTHING_(1.5a)") || window.WindowClass.EndsWith("EVERYTHING_(1.5a)")));
+
+		// FFMetrics
+		filterManager.AddProcessFileNameFilter("FFMetrics.exe");
+
+		// Figma
+		filterManager.AddProcessFileNameFilter("Figma.exe");
+
+		// Files
+		filterManager.AddProcessFileNameFilter("Files.exe");
+
+		// Flow Launcher
+		filterManager.AddProcessFileNameFilter("Flow.Launcher.exe");
+
 		// GOG Galaxy
 		filterManager.Add((window) => (window.WindowClass.StartsWith("Chrome_RenderWidgetHostHWND") || window.WindowClass.EndsWith("Chrome_RenderWidgetHostHWND")));
 
 		// GitHub Credential Manager
 		filterManager.AddProcessFileNameFilter("git-credential-manager.exe");
+
+		// GitHub Desktop
+		filterManager.AddProcessFileNameFilter("GitHubDesktop.exe");
+
+		// GoPro Webcam
+		filterManager.Add((window) => (window.WindowClass.StartsWith("GoPro Webcam") || window.WindowClass.EndsWith("GoPro Webcam")));
+
+		// Godot Manager
+		filterManager.AddProcessFileNameFilter("GodotManager.exe");
+
+		// Golden Dict
+		filterManager.AddProcessFileNameFilter("GoldenDict.exe");
+
+		// Google Chrome
+		filterManager.AddProcessFileNameFilter("chrome.exe");
 
 		// Google Drive
 		filterManager.AddProcessFileNameFilter("GoogleDriveFS.exe");
@@ -115,11 +232,32 @@ internal static class DefaultFilteredWindowsKomorebi
 		// Guitar Rig 7
 		filterManager.AddProcessFileNameFilter("Guitar Rig 7.exe");
 
+		// Honeyview
+		filterManager.Add((window) => (window.WindowClass.StartsWith("HoneyviewClassX") || window.WindowClass.EndsWith("HoneyviewClassX")));
+
+		// Houdoku
+		filterManager.AddProcessFileNameFilter("Houdoku.exe");
+
 		// IntelliJ IDEA
 		// filterManager.AddWindowClassFilter("SunAwtDialog");  // duplicate rule
 
+		// Itch.io
+		filterManager.AddProcessFileNameFilter("itch.exe");
+
+		// KOOK
+		filterManager.AddProcessFileNameFilter("KOOK.exe");
+
 		// Keyviz
 		filterManager.AddProcessFileNameFilter("keyviz.exe");
+
+		// Kleopatra
+		filterManager.AddProcessFileNameFilter("kleopatra.exe");
+
+		// Kotatogram
+		filterManager.AddProcessFileNameFilter("Kotatogram.exe");
+
+		// LocalSend
+		filterManager.AddProcessFileNameFilter("localsend_app.exe");
 
 		// Logi Bolt
 		filterManager.AddProcessFileNameFilter("LogiBolt.exe");
@@ -127,8 +265,26 @@ internal static class DefaultFilteredWindowsKomorebi
 		// LogiTune
 		filterManager.AddProcessFileNameFilter("LogiTune.exe");
 
+		// Logitech G HUB
+		filterManager.AddProcessFileNameFilter("lghub.exe");
+
 		// Logitech Options
 		filterManager.AddProcessFileNameFilter("LogiOptionsUI.exe");
+
+		// Mailspring
+		filterManager.AddProcessFileNameFilter("mailspring.exe");
+
+		// ManicTime
+		filterManager.AddProcessFileNameFilter("ManicTimeClient.exe");
+
+		// ManyCam
+		filterManager.AddProcessFileNameFilter("ManyCam.exe");
+
+		// Mattermost
+		filterManager.AddProcessFileNameFilter("Mattermost.exe");
+
+		// Mica For Everyone
+		filterManager.AddProcessFileNameFilter("MicaForEveryone.exe");
 
 		// Microsoft Active Accessibility
 		filterManager.Add((window) => (window.WindowClass.StartsWith("#32770") || window.WindowClass.EndsWith("#32770")));
@@ -146,6 +302,12 @@ internal static class DefaultFilteredWindowsKomorebi
 		// Microsoft PowerPoint
 		// filterManager.Add((window) => (window.WindowClass.StartsWith("_WwB") || window.WindowClass.EndsWith("_WwB")));  // duplicate rule
 
+		// Microsoft SQL Server Management Studio
+		filterManager.AddProcessFileNameFilter("Ssms.exe");
+
+		// Microsoft Teams
+		filterManager.Add((window) => (window.WindowClass.StartsWith("TeamsWebView") || window.WindowClass.EndsWith("TeamsWebView")));
+
 		// Microsoft Teams classic
 		filterManager.Add((window) => (window.Title.StartsWith("Microsoft Teams Notification") || window.Title.EndsWith("Microsoft Teams Notification")));
 		filterManager.Add((window) => (window.Title.StartsWith("Microsoft Teams Call") || window.Title.EndsWith("Microsoft Teams Call")));
@@ -153,24 +315,75 @@ internal static class DefaultFilteredWindowsKomorebi
 		// Microsoft Word
 		// filterManager.Add((window) => (window.WindowClass.StartsWith("_WwB") || window.WindowClass.EndsWith("_WwB")));  // duplicate rule
 
+		// Modern Flyouts
+		filterManager.AddProcessFileNameFilter("ModernFlyoutsHost.exe");
+
+		// Morgen
+		filterManager.AddProcessFileNameFilter("Morgen.exe");
+
 		// Mozilla Firefox
 		filterManager.Add((window) => (window.WindowClass.StartsWith("MozillaTaskbarPreviewClass") || window.WindowClass.EndsWith("MozillaTaskbarPreviewClass")));
 		filterManager.Add((window) => window.Title.Equals("Picture-in-Picture") && window.ProcessFileName.Equals("firefox.exe"));
 
+		// MuseScore
+		filterManager.AddProcessFileNameFilter("MuseScore.exe");
+
+		// NVIDIA GeForce Experience
+		filterManager.AddProcessFileNameFilter("NVIDIA GeForce Experience.exe");
+
+		// NZXT CAM
+		filterManager.AddProcessFileNameFilter("NZXT CAM.exe");
+
+		// NetEase Cloud Music
+		filterManager.AddProcessFileNameFilter("cloudmusic.exe");
+
+		// NiceHash Miner
+		filterManager.AddProcessFileNameFilter("nhm_app.exe");
+
 		// NohBoard
 		filterManager.AddProcessFileNameFilter("NohBoard.exe");
+
+		// Notion Enhanced
+		filterManager.AddProcessFileNameFilter("Notion Enhanced.exe");
+
+		// OBS Studio (32-bit)
+		filterManager.AddProcessFileNameFilter("obs32.exe");
+
+		// OBS Studio (64-bit)
+		filterManager.AddProcessFileNameFilter("obs64.exe");
+
+		// ONLYOFFICE Editors
+		filterManager.Add((window) => (window.WindowClass.StartsWith("DocEditorsWindowClass") || window.WindowClass.EndsWith("DocEditorsWindowClass")));
+
+		// Obsidian
+		filterManager.AddProcessFileNameFilter("Obsidian.exe");
 
 		// OneDrive
 		filterManager.Add((window) => (window.WindowClass.StartsWith("OneDriveReactNativeWin32WindowClass") || window.WindowClass.EndsWith("OneDriveReactNativeWin32WindowClass")));
 
+		// OneQuick
+		filterManager.AddProcessFileNameFilter("OneQuick.exe");
+
+		// OpenRGB
+		filterManager.AddProcessFileNameFilter("OpenRGB.exe");
+
 		// Paradox Launcher
 		filterManager.AddProcessFileNameFilter("Paradox Launcher.exe");
+
+		// Passware Kit Forensic
+		filterManager.AddProcessFileNameFilter("PasswareKitForensic.exe");
 
 		// PhpStorm
 		// filterManager.AddWindowClassFilter("SunAwtDialog");  // duplicate rule
 
 		// Playnite
 		filterManager.AddProcessFileNameFilter("Playnite.FullscreenApp.exe");
+
+		// Plexamp
+		filterManager.AddProcessFileNameFilter("Plexamp.exe");
+
+		// Postman
+		filterManager.AddProcessFileNameFilter("Postman.exe");
 
 		// PowerToys
 		filterManager.AddProcessFileNameFilter("PowerToys.ColorPickerUI.exe");
@@ -183,6 +396,12 @@ internal static class DefaultFilteredWindowsKomorebi
 		// Process Hacker
 		filterManager.AddProcessFileNameFilter("ProcessHacker.exe");
 
+		// ProtonDrive
+		filterManager.AddProcessFileNameFilter("ProtonDrive.exe");
+
+		// ProtonVPN
+		filterManager.AddProcessFileNameFilter("ProtonVPN.exe");
+
 		// PyCharm
 		// filterManager.AddWindowClassFilter("SunAwtDialog");  // duplicate rule
 
@@ -190,6 +409,9 @@ internal static class DefaultFilteredWindowsKomorebi
 		filterManager.Add((window) => (window.Title.StartsWith("图片查看器") || window.Title.EndsWith("图片查看器")));
 		filterManager.Add((window) => (window.Title.StartsWith("群聊的聊天记录") || window.Title.EndsWith("群聊的聊天记录")));
 		filterManager.Add((window) => (window.Title.StartsWith("语音通话") || window.Title.EndsWith("语音通话")));
+
+		// QtScrcpy
+		filterManager.AddProcessFileNameFilter("QtScrcpy.exe");
 
 		// QuickLook
 		filterManager.AddProcessFileNameFilter("QuickLook.exe");
@@ -201,14 +423,32 @@ internal static class DefaultFilteredWindowsKomorebi
 		// filterManager.AddWindowClassFilter("SunAwtDialog");  // duplicate rule
 		filterManager.Add((window) => (window.Title.StartsWith("PopupMessageWindow") || window.Title.EndsWith("PopupMessageWindow")));
 
+		// Roblox FPS Unlocker
+		filterManager.AddProcessFileNameFilter("rbxfpsunlocker.exe");
+
 		// RoundedTB
 		filterManager.AddProcessFileNameFilter("RoundedTB.exe");
+
+		// RoundedTB
+		// filterManager.AddProcessFileNameFilter("RoundedTB.exe");  // duplicate rule
 
 		// RustRover
 		// filterManager.AddWindowClassFilter("SunAwtDialog");  // duplicate rule
 
+		// Sandboxie Plus
+		filterManager.AddProcessFileNameFilter("SandMan.exe");
+
+		// ShareX
+		filterManager.AddProcessFileNameFilter("ShareX.exe");
+
 		// Sideloadly
 		filterManager.AddProcessFileNameFilter("sideloadly.exe");
+
+		// Signal
+		filterManager.AddProcessFileNameFilter("Signal.exe");
+
+		// SiriKali
+		filterManager.AddProcessFileNameFilter("sirikali.exe");
 
 		// Slack
 		// filterManager.Add((window) => (window.WindowClass.StartsWith("Chrome_RenderWidgetHostHWND") || window.WindowClass.EndsWith("Chrome_RenderWidgetHostHWND")));  // duplicate rule
@@ -223,11 +463,26 @@ internal static class DefaultFilteredWindowsKomorebi
 		// SnippingTool
 		filterManager.AddProcessFileNameFilter("SnippingTool.exe");
 
+		// SoulseekQt
+		filterManager.AddProcessFileNameFilter("SoulseekQt.exe");
+
+		// SpaceWalker.Desktop
+		filterManager.AddProcessFileNameFilter("SpaceWalker.Desktop.exe");
+
+		// SpaceWalker.Unity.exe
+		filterManager.AddProcessFileNameFilter("SpaceWalker.Unity.exe");
+
+		// Spotify
+		filterManager.AddProcessFileNameFilter("Spotify.exe");
+
 		// Steam
 		filterManager.Add((window) => window.ProcessFileName.Equals("steamwebhelper.exe") && !window.Title.Equals("Steam"));
 
 		// Steam Beta
 		filterManager.Add((window) => (window.Title.StartsWith("notificationtoasts_") || window.Title.EndsWith("notificationtoasts_")));
+
+		// Stremio
+		filterManager.AddProcessFileNameFilter("stremio.exe");
 
 		// System Informer
 		filterManager.AddProcessFileNameFilter("SystemInformer.exe");
@@ -238,6 +493,12 @@ internal static class DefaultFilteredWindowsKomorebi
 		// Task Manager
 		filterManager.Add((window) => (window.WindowClass.StartsWith("TaskManagerWindow") || window.WindowClass.EndsWith("TaskManagerWindow")));
 
+		// Telegram
+		filterManager.AddProcessFileNameFilter("Telegram.exe");
+
+		// TickTick
+		filterManager.AddProcessFileNameFilter("TickTick.exe");
+
 		// Total Commander
 		filterManager.AddWindowClassFilter("TDLG2FILEACTIONMIN");
 
@@ -246,6 +507,36 @@ internal static class DefaultFilteredWindowsKomorebi
 
 		// TranslucentTB
 		filterManager.AddProcessFileNameFilter("TranslucentTB.exe");
+
+		// TranslucentTB
+		// filterManager.AddProcessFileNameFilter("TranslucentTB.exe");  // duplicate rule
+
+		// UniGetUI
+		filterManager.AddProcessFileNameFilter("UniGetUI.exe");
+
+		// Unity Hub
+		filterManager.AddProcessFileNameFilter("Unity Hub.exe");
+
+		// Unreal Editor
+		filterManager.AddProcessFileNameFilter("UnrealEditor.exe");
+
+		// VMware Horizon Client
+		filterManager.AddProcessFileNameFilter("vmware-view.exe");
+
+		// VRCX
+		filterManager.AddProcessFileNameFilter("VRCX.exe");
+
+		// Visual Studio
+		filterManager.AddProcessFileNameFilter("devenv.exe");
+
+		// Visual Studio Code
+		filterManager.AddProcessFileNameFilter("Code.exe");
+
+		// Visual Studio Code - Insiders
+		filterManager.AddProcessFileNameFilter("Code - Insiders.exe");
+
+		// Voice.ai
+		filterManager.AddProcessFileNameFilter("VoiceAI.exe");
 
 		// WeChat
 		filterManager.AddWindowClassFilter("WeChatLoginWndForPC");
@@ -259,11 +550,17 @@ internal static class DefaultFilteredWindowsKomorebi
 		// WebStorm
 		// filterManager.AddWindowClassFilter("SunAwtDialog");  // duplicate rule
 
+		// WebTorrent Desktop
+		filterManager.AddProcessFileNameFilter("WebTorrent.exe");
+
 		// WinZip (32-bit)
 		filterManager.AddProcessFileNameFilter("winzip32.exe");
 
 		// WinZip (64-bit)
 		filterManager.AddProcessFileNameFilter("winzip64.exe");
+
+		// Windows Console (conhost.exe)
+		filterManager.AddWindowClassFilter("ConsoleWindowClass");
 
 		// Windows Explorer
 		filterManager.Add((window) => (window.WindowClass.StartsWith("OperationStatusWindow") || window.WindowClass.EndsWith("OperationStatusWindow")));
@@ -278,8 +575,17 @@ internal static class DefaultFilteredWindowsKomorebi
 		// Windows Update Standalone Installer
 		filterManager.AddProcessFileNameFilter("wusa.exe");
 
+		// WingetUI
+		filterManager.AddProcessFileNameFilter("WingetUI.exe");
+
+		// WingetUI
+		filterManager.AddProcessFileNameFilter("wingetui.exe");
+
 		// Wox
 		filterManager.Add((window) => (window.Title.StartsWith("Hotkey sink") || window.Title.EndsWith("Hotkey sink")));
+
+		// XAMPP Control Panel
+		filterManager.AddProcessFileNameFilter("xampp-control.exe");
 
 		// Zebar
 		filterManager.AddProcessFileNameFilter("zebar.exe");
@@ -294,11 +600,23 @@ internal static class DefaultFilteredWindowsKomorebi
 		// komorebi-gui
 		filterManager.AddProcessFileNameFilter("komorebi-gui.exe");
 
+		// mpv
+		filterManager.Add((window) => (window.WindowClass.StartsWith("mpv") || window.WindowClass.EndsWith("mpv")));
+
+		// mpv.net
+		filterManager.AddProcessFileNameFilter("mpvnet.exe");
+
 		// paint.net
 		filterManager.AddProcessFileNameFilter("paintdotnet.exe");
 
 		// pinentry
 		filterManager.AddProcessFileNameFilter("pinentry.exe");
+
+		// qBittorrent
+		filterManager.AddProcessFileNameFilter("qbittorrent.exe");
+
+		// todoist
+		filterManager.AddProcessFileNameFilter("Todoist.exe");
 
 		// ueli
 		filterManager.AddProcessFileNameFilter("ueli.exe");
