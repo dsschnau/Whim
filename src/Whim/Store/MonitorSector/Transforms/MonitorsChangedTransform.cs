@@ -82,14 +82,20 @@ internal record MonitorsChangedTransform : Transform
 
 		sector.Monitors = MonitorUtils.GetCurrentMonitors(internalCtx);
 
+		// Cache whether any monitor has non-standard DPI scaling to avoid checking on every layout
+		sector.HasNonStandardScaling = false;
 		foreach (IMonitor m in sector.Monitors)
 		{
+			if (m.ScaleFactor != 100)
+			{
+				sector.HasNonStandardScaling = true;
+			}
+
 			if (m.IsPrimary)
 			{
 				sector.PrimaryMonitorHandle = m.Handle;
 				sector.ActiveMonitorHandle = m.Handle;
 				sector.LastWhimActiveMonitorHandle = m.Handle;
-				break;
 			}
 		}
 	}

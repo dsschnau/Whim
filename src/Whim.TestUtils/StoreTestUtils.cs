@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NSubstitute;
 using Windows.Win32.Foundation;
 using Windows.Win32.Graphics.Gdi;
@@ -109,6 +110,9 @@ internal static class StoreTestUtils
 		{
 			rootSector.MonitorSector.ActiveMonitorHandle = newMonitors[0].Handle;
 		}
+
+		// Update HasNonStandardScaling based on whether any monitor has non-100% scaling
+		rootSector.MonitorSector.HasNonStandardScaling = rootSector.MonitorSector.Monitors.Any(m => m.ScaleFactor != 100);
 	}
 
 	public static void AddWindowToSector(MutableRootSector rootSector, IWindow window)
@@ -173,6 +177,9 @@ internal static class StoreTestUtils
 		{
 			rootSector.MonitorSector.ActiveMonitorHandle = monitor.Handle;
 		}
+
+		// Update HasNonStandardScaling based on whether any monitor has non-100% scaling
+		rootSector.MonitorSector.HasNonStandardScaling = rootSector.MonitorSector.Monitors.Any(m => m.ScaleFactor != 100);
 
 		AddWorkspaceToStore(rootSector, workspace);
 	}

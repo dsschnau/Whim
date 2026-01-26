@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Threading.Tasks;
 using Windows.Win32.UI.WindowsAndMessaging;
 
@@ -113,23 +114,15 @@ public sealed class DeferWindowPosHandle : IDisposable
 	{
 		Logger.Verbose("Disposing WindowDeferPosHandle");
 
-		if (_windowStates.Count == 0 && _minimizedWindowStates.Count == 0)
+		int totalCount = _windowStates.Count + _minimizedWindowStates.Count;
+		if (totalCount == 0)
 		{
 			Logger.Verbose("No windows to set position for");
 			return;
 		}
 
-		// Check to see if any monitors have non-100% scaling.
-		// If so, we need to set the window position twice.
-		int numPasses = 1;
-		foreach (IMonitor monitor in _context.Store.Pick(PickAllMonitors()))
-		{
-			if (monitor.ScaleFactor != 100 || _forceTwoPasses)
-			{
-				numPasses = 2;
-				break;
-			}
-		}
+		// Use cached DPI scaling check instead of iterating monitors on every layout
+		int numPasses = (_forceTwoPasses || _context.Store.Pick(PickMonitorSector()).HasNonStandardScaling) ? 2 : 1;
 
 		Logger.Verbose($"Setting window position {numPasses} times for {_windowStates.Count} windows");
 
@@ -148,23 +141,34 @@ public sealed class DeferWindowPosHandle : IDisposable
 		// which has no guarantees.
 		// However, calling `Parallel.ForEach` separately for minimized windows didn't result in the desired focus
 		// behaviour.
-		DeferWindowPosState[] allStates = new DeferWindowPosState[_windowStates.Count + _minimizedWindowStates.Count];
-		_windowStates.CopyTo(allStates);
-		_minimizedWindowStates.CopyTo(allStates, _windowStates.Count);
 
-		if (allStates.Length == 1)
+		// Use ArrayPool to avoid allocation on every layout
+		DeferWindowPosState[] allStates = ArrayPool<DeferWindowPosState>.Shared.Rent(totalCount);
+		try
 		{
-			for (int i = 0; i < numPasses; i++)
+			_windowStates.CopyTo(allStates);
+			_minimizedWindowStates.CopyTo(allStates, _windowStates.Count);
+
+			if (totalCount == 1)
 			{
-				SetWindowPos(allStates[0]);
+				for (int i = 0; i < numPasses; i++)
+				{
+					SetWindowPos(allStates[0]);
+				}
+			}
+			else
+			{
+				// Create a span/segment to only iterate the actual elements, not the full rented array
+				ArraySegment<DeferWindowPosState> segment = new(allStates, 0, totalCount);
+				for (int i = 0; i < numPasses; i++)
+				{
+					Parallel.ForEach(segment, ParallelOptions, SetWindowPos);
+				}
 			}
 		}
-		else
+		finally
 		{
-			for (int i = 0; i < numPasses; i++)
-			{
-				Parallel.ForEach(allStates, ParallelOptions, SetWindowPos);
-			}
+			ArrayPool<DeferWindowPosState>.Shared.Return(allStates);
 		}
 
 		Logger.Verbose("Finished setting window position");

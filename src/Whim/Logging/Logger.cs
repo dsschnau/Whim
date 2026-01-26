@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.IO;
 using System.Runtime.CompilerServices;
 using Serilog;
@@ -25,6 +26,12 @@ public class Logger : IDisposable
 	private LoggerConfiguration? _loggerConfiguration;
 
 	private bool _disposedValue;
+
+	/// <summary>
+	/// Cache for caller info strings to avoid repeated allocations.
+	/// Key: (sourceFilePath, memberName, sourceLineNumber) -> formatted caller prefix.
+	/// </summary>
+	private static readonly ConcurrentDictionary<(string, string, int), string> _callerInfoCache = new();
 
 	/// <summary>
 	/// The config for the logger.
@@ -81,12 +88,19 @@ public class Logger : IDisposable
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private static string AddCaller(string message, string memberName, string sourceFilePath, int sourceLineNumber)
 	{
-		string fileName = Path.GetFileNameWithoutExtension(sourceFilePath);
-		string fileLocation = $"{fileName}:{sourceLineNumber}";
+		// Cache the caller info prefix to avoid repeated string allocations for the same call site
+		string callerPrefix = _callerInfoCache.GetOrAdd(
+			(sourceFilePath, memberName, sourceLineNumber),
+			static key =>
+			{
+				string fileName = Path.GetFileNameWithoutExtension(key.Item1);
+				string fileLocation = $"{fileName}:{key.Item3}";
+				string methodName = $"[{key.Item2}]";
+				return $"{fileLocation,-30} {methodName,-30} ";
+			}
+		);
 
-		string methodName = $"[{memberName}]";
-
-		return $"{fileLocation, -30} {methodName, -30} {message}";
+		return string.Concat(callerPrefix, message);
 	}
 
 	/// <summary>

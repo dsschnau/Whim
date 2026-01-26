@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Windows.Win32;
 using Windows.Win32.UI.Accessibility;
 using Windows.Win32.UI.WindowsAndMessaging;
@@ -9,6 +10,18 @@ internal class WindowEventListener : IDisposable
 	private readonly IContext _ctx;
 	private readonly IInternalContext _internalCtx;
 	private bool _disposedValue;
+
+	/// <summary>
+	/// Throttle interval for EVENT_OBJECT_LOCATIONCHANGE events in milliseconds.
+	/// 30ms provides ~33Hz update rate, balancing responsiveness with performance.
+	/// </summary>
+	private const long LocationChangeThrottleMs = 30;
+
+	/// <summary>
+	/// Tracks the last processed location change timestamp per window handle.
+	/// Uses Stopwatch ticks for high-resolution timing without allocations.
+	/// </summary>
+	private readonly Dictionary<HWND, long> _lastLocationChangeTimestamp = [];
 
 	/// <summary>
 	/// All the hooks added with <see cref="ICoreNativeManager.SetWinEventHook"/>.
@@ -162,6 +175,7 @@ internal class WindowEventListener : IDisposable
 				break;
 			case PInvoke.EVENT_OBJECT_DESTROY:
 			case PInvoke.EVENT_OBJECT_CLOAKED:
+				_lastLocationChangeTimestamp.Remove(hwnd);
 				_ctx.Store.Dispatch(new WindowRemovedTransform(window));
 				break;
 			case PInvoke.EVENT_SYSTEM_MOVESIZESTART:
@@ -171,6 +185,17 @@ internal class WindowEventListener : IDisposable
 				_ctx.Store.Dispatch(new WindowMoveEndedTransform(window));
 				break;
 			case PInvoke.EVENT_OBJECT_LOCATIONCHANGE:
+				long now = Stopwatch.GetTimestamp();
+				if (_lastLocationChangeTimestamp.TryGetValue(hwnd, out long lastTimestamp))
+				{
+					long elapsedMs = (now - lastTimestamp) * 1000 / Stopwatch.Frequency;
+					if (elapsedMs < LocationChangeThrottleMs)
+					{
+						// Throttled - skip this event to reduce processing overhead
+						break;
+					}
+				}
+				_lastLocationChangeTimestamp[hwnd] = now;
 				_ctx.Store.Dispatch(new WindowMovedTransform(window));
 				break;
 			case PInvoke.EVENT_SYSTEM_MINIMIZESTART:

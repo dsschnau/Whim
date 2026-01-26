@@ -17,6 +17,12 @@ internal class MonitorSector(IContext ctx, IInternalContext internalCtx)
 	public HMONITOR PrimaryMonitorHandle { get; set; }
 	public HMONITOR LastWhimActiveMonitorHandle { get; set; }
 
+	/// <summary>
+	/// Cached flag indicating if any monitor has non-100% DPI scaling.
+	/// Updated when monitors change to avoid checking on every layout operation.
+	/// </summary>
+	public bool HasNonStandardScaling { get; set; }
+
 	public event EventHandler<MonitorsChangedEventArgs>? MonitorsChanged;
 
 	public override void Initialize()

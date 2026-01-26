@@ -94,7 +94,8 @@ public record FocusLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Adding window {window} to layout engine {Name}");
 
-		if (_list.Contains(window))
+		// Use IndexOf instead of Contains to avoid redundant O(n) search
+		if (_list.IndexOf(window) >= 0)
 		{
 			Logger.Debug($"Window {window} already exists in layout engine {Name}");
 			return this;
@@ -109,13 +110,15 @@ public record FocusLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Removing window {window} from layout engine {Name}");
 
-		if (!_list.Contains(window))
+		// Use IndexOf instead of Contains to avoid redundant O(n) search
+		int index = _list.IndexOf(window);
+		if (index < 0)
 		{
 			Logger.Debug($"Window {window} does not exist in layout engine {Name}");
 			return this;
 		}
 
-		return new FocusLayoutEngine(this, _list.Remove(window), _focusedIndex, _maximized, _hideFocusedWindow);
+		return new FocusLayoutEngine(this, _list.RemoveAt(index), _focusedIndex, _maximized, _hideFocusedWindow);
 	}
 
 	/// <inheritdoc/>
@@ -188,13 +191,14 @@ public record FocusLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Focusing window {window} in direction {direction} in layout engine {Name}");
 
-		if (!_list.Contains(window))
+		// Use IndexOf directly instead of Contains + IndexOf (avoids two O(n) searches)
+		int index = _list.IndexOf(window);
+		if (index < 0)
 		{
 			Logger.Debug($"Window {window} does not exist in layout engine {Name}");
 			return this;
 		}
 
-		int index = _list.IndexOf(window);
 		int newIndex = direction switch
 		{
 			Direction.Left => index - 1,
@@ -212,13 +216,14 @@ public record FocusLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Swapping window {window} in direction {direction} in layout engine {Name}");
 
-		if (!_list.Contains(window))
+		// Use IndexOf directly instead of Contains + IndexOf (avoids two O(n) searches)
+		int index = _list.IndexOf(window);
+		if (index < 0)
 		{
 			Logger.Debug($"Window {window} does not exist in layout engine {Name}");
 			return this;
 		}
 
-		int index = _list.IndexOf(window);
 		int newIndex = direction switch
 		{
 			Direction.Left => index - 1,
@@ -245,7 +250,9 @@ public record FocusLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Minimizing window {window} in layout engine {Name}");
 
-		if (!_list.Contains(window))
+		// Use IndexOf instead of Contains to avoid redundant O(n) search
+		int index = _list.IndexOf(window);
+		if (index < 0)
 		{
 			return new FocusLayoutEngine(
 				this,
@@ -256,7 +263,7 @@ public record FocusLayoutEngine : ILayoutEngine
 			);
 		}
 
-		if (window.Equals(_list[_focusedIndex]))
+		if (index == _focusedIndex)
 		{
 			return new FocusLayoutEngine(this, _list, _focusedIndex, _maximized, true);
 		}
@@ -269,16 +276,17 @@ public record FocusLayoutEngine : ILayoutEngine
 	{
 		Logger.Debug($"Restoring window {window} in layout engine {Name}");
 
-		ImmutableList<IWindow> newList = _list;
-		int idx;
-		if (!newList.Contains(window))
+		// Use IndexOf directly instead of Contains + IndexOf (avoids two O(n) searches)
+		int idx = _list.IndexOf(window);
+		ImmutableList<IWindow> newList;
+		if (idx < 0)
 		{
-			newList = newList.Add(window);
+			newList = _list.Add(window);
 			idx = newList.Count - 1;
 		}
 		else
 		{
-			idx = newList.IndexOf(window);
+			newList = _list;
 		}
 
 		return new FocusLayoutEngine(this, newList, idx, _maximized, false);

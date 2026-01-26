@@ -6,9 +6,10 @@ namespace Whim;
 internal class FilterManager : IFilterManager
 {
 	#region Filters for specific properties
-	private readonly HashSet<string> _ignoreWindowClasses = [];
-	private readonly HashSet<string> _ignoreProcessFileNames = [];
-	private readonly HashSet<string> _ignoreTitles = [];
+	// Use case-insensitive comparison to avoid allocating lowercase strings on every ShouldBeIgnored check
+	private readonly HashSet<string> _ignoreWindowClasses = new(StringComparer.OrdinalIgnoreCase);
+	private readonly HashSet<string> _ignoreProcessFileNames = new(StringComparer.OrdinalIgnoreCase);
+	private readonly HashSet<string> _ignoreTitles = new(StringComparer.OrdinalIgnoreCase);
 	#endregion
 
 	/// <summary>
@@ -31,29 +32,26 @@ internal class FilterManager : IFilterManager
 	}
 
 	public bool ShouldBeIgnored(IWindow window) =>
-		_ignoreWindowClasses.Contains(window.WindowClass.ToLower())
-		|| (
-			window.ProcessFileName is string processFileName
-			&& _ignoreProcessFileNames.Contains(processFileName.ToLower())
-		)
-		|| _ignoreTitles.Contains(window.Title.ToLower())
+		_ignoreWindowClasses.Contains(window.WindowClass)
+		|| (window.ProcessFileName is string processFileName && _ignoreProcessFileNames.Contains(processFileName))
+		|| _ignoreTitles.Contains(window.Title)
 		|| _filters.Any(f => f(window));
 
 	public IFilterManager AddWindowClassFilter(string windowClass)
 	{
-		_ignoreWindowClasses.Add(windowClass.ToLower());
+		_ignoreWindowClasses.Add(windowClass);
 		return this;
 	}
 
 	public IFilterManager AddProcessFileNameFilter(string processFileName)
 	{
-		_ignoreProcessFileNames.Add(processFileName.ToLower());
+		_ignoreProcessFileNames.Add(processFileName);
 		return this;
 	}
 
 	public IFilterManager AddTitleFilter(string title)
 	{
-		_ignoreTitles.Add(title.ToLower());
+		_ignoreTitles.Add(title);
 		return this;
 	}
 

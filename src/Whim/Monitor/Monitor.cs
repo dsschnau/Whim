@@ -11,10 +11,15 @@ internal record Monitor : IMonitor
 	public bool IsPrimary { get; }
 	public int ScaleFactor { get; }
 
-	// Bounds and WorkingArea are lazily evaluated because sometimes they return incorrect values
-	// inside RDP sessions, during display changes. This is a workaround for that.
-	public IRectangle<int> Bounds => GetBounds();
-	public IRectangle<int> WorkingArea => GetWorkingArea();
+	// Cached monitor bounds and working area. These are lazily evaluated on first access
+	// because sometimes they return incorrect values inside RDP sessions during display changes.
+	// Once cached, values are reused. Monitor objects are recreated on display changes,
+	// so the cache is naturally invalidated.
+	private IRectangle<int>? _cachedBounds;
+	private IRectangle<int>? _cachedWorkingArea;
+
+	public IRectangle<int> Bounds => _cachedBounds ??= GetBounds();
+	public IRectangle<int> WorkingArea => _cachedWorkingArea ??= GetWorkingArea();
 
 	public Monitor(IInternalContext internalContext, HMONITOR monitor, bool isPrimaryHMonitor)
 	{

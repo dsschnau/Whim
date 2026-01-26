@@ -3,6 +3,15 @@ namespace Whim;
 public static partial class Pickers
 {
 	/// <summary>
+	/// Get the monitor sector for accessing monitor-related state.
+	/// </summary>
+	/// <returns>
+	/// The monitor sector, when passed to <see cref="IStore.Pick{TResult}(PurePicker{TResult})"/>.
+	/// </returns>
+	public static PurePicker<IMonitorSector> PickMonitorSector() =>
+		static (rootSector) => rootSector.MonitorSector;
+
+	/// <summary>
 	/// Get a monitor by its <see cref="HMONITOR"/> handle.
 	/// </summary>
 	/// <param name="handle"></param>

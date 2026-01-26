@@ -29,4 +29,10 @@ public interface IMonitorSector
 	/// The handle of the last monitor which received an event sent by Windows which Whim did not ignore.
 	/// </summary>
 	HMONITOR LastWhimActiveMonitorHandle { get; }
+
+	/// <summary>
+	/// Cached flag indicating if any monitor has non-100% DPI scaling.
+	/// This is updated when monitors change to avoid checking on every layout operation.
+	/// </summary>
+	bool HasNonStandardScaling { get; }
 }

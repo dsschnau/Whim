@@ -16,6 +16,11 @@ internal class KeybindHook : IKeybindHook
 	private UnhookWindowsHookExSafeHandle? _unhookKeyboardHook;
 	private bool _disposedValue;
 
+	/// <summary>
+	/// Reusable list for collecting pressed modifiers, avoiding allocation on every keypress.
+	/// </summary>
+	private readonly List<VIRTUAL_KEY> _pressedModifiersBuffer = new(4);
+
 	public KeybindHook(IContext context, IInternalContext internalContext)
 	{
 		_context = context;
@@ -85,16 +90,16 @@ internal class KeybindHook : IKeybindHook
 
 	private IKeybind? GetKeybindForKey(VIRTUAL_KEY eventKey)
 	{
-		List<VIRTUAL_KEY> pressedModifiers = [];
+		_pressedModifiersBuffer.Clear();
 		foreach (VIRTUAL_KEY modifier in _context.KeybindManager.Modifiers)
 		{
 			if (IsModifierPressed(modifier))
 			{
-				pressedModifiers.Add(modifier);
+				_pressedModifiersBuffer.Add(modifier);
 			}
 		}
 
-		return new Keybind(pressedModifiers, eventKey);
+		return new Keybind(_pressedModifiersBuffer, eventKey);
 	}
 
 	private bool IsModifierPressed(VIRTUAL_KEY key) =>

@@ -1,5 +1,3 @@
-using System.Linq;
-
 namespace Whim;
 
 /// <summary>
@@ -132,7 +130,12 @@ public static partial class Pickers
 				return Result.FromError<IWorkspace>(StoreErrors.WorkspaceNotFound(workspaceId));
 			}
 
-			WorkspaceId activeWorkspaceId = PickActiveWorkspaceId()(rootSector);
+			// Build HashSet of active workspace IDs for O(1) lookup instead of O(n) ContainsValue
+			HashSet<WorkspaceId>? activeWorkspaceIds = null;
+			if (skipActive)
+			{
+				activeWorkspaceIds = [.. mapSector.MonitorWorkspaceMap.Values];
+			}
 
 			int delta = reverse ? -1 : 1;
 			int nextIdx = (idx + delta).Mod(order.Length);
@@ -140,7 +143,7 @@ public static partial class Pickers
 			{
 				WorkspaceId nextWorkspaceId = order[nextIdx];
 
-				bool isActive = mapSector.MonitorWorkspaceMap.ContainsValue(nextWorkspaceId);
+				bool isActive = activeWorkspaceIds?.Contains(nextWorkspaceId) ?? false;
 
 				if (!skipActive || !isActive)
 				{
@@ -208,12 +211,15 @@ public static partial class Pickers
 				)
 			)
 			{
-				List<HMONITOR> monitorHandles =
-				[
-					.. monitorIndices
-						.Where(monitorIndex => monitorIndex >= 0 && monitorIndex < monitors.Length)
-						.Select(monitorIndex => monitors[monitorIndex].Handle),
-				];
+				// Use direct loop instead of LINQ Where/Select to avoid intermediate allocations
+				List<HMONITOR> monitorHandles = new(monitorIndices.Length);
+				foreach (int monitorIndex in monitorIndices)
+				{
+					if (monitorIndex >= 0 && monitorIndex < monitors.Length)
+					{
+						monitorHandles.Add(monitors[monitorIndex].Handle);
+					}
+				}
 
 				if (monitorHandles.Count != 0)
 				{
@@ -222,7 +228,12 @@ public static partial class Pickers
 			}
 
 			// If the workspace isn't sticky, or there are no longer any valid monitors for it, allow it on all monitors.
-			return monitors.Select(monitor => monitor.Handle).ToList();
+			List<HMONITOR> allMonitorHandles = new(monitors.Length);
+			foreach (IMonitor monitor in monitors)
+			{
+				allMonitorHandles.Add(monitor.Handle);
+			}
+			return allMonitorHandles;
 		};
 
 	/// <summary>
@@ -325,9 +336,10 @@ public static partial class Pickers
 				return Result.FromError<HMONITOR>(StoreErrors.WorkspaceNotFound(workspaceId));
 			}
 
-			// Get the valid monitors for the workspace.
-			IReadOnlyList<HMONITOR> validMonitors =
+			// Get the valid monitors for the workspace and convert to HashSet for O(1) Contains
+			IReadOnlyList<HMONITOR> validMonitorsList =
 				PickStickyMonitorsByWorkspace(workspaceId)(rootSector).ValueOrDefault ?? [];
+			HashSet<HMONITOR> validMonitors = [.. validMonitorsList];
 
 			// Try activate on the current monitor.
 			HMONITOR targetMonitorHandle = monitorHandle;
@@ -398,9 +410,9 @@ public static partial class Pickers
 			ImmutableArray<IMonitor> monitors = monitorSector.Monitors;
 			int monitorIndex = monitors.IndexOf(monitor);
 
-			// Get the workspaces which can be shown on the monitor.
-			List<WorkspaceId> processedWorkspaces = [];
-			List<WorkspaceId> unsortedWorkspaces = [];
+			// Use HashSet for O(1) Contains instead of O(n) List.Contains
+			HashSet<WorkspaceId> processedWorkspaces = [];
+			HashSet<WorkspaceId> unsortedWorkspaces = [];
 
 			foreach (
 				(
@@ -410,10 +422,22 @@ public static partial class Pickers
 			)
 			{
 				// If the workspace is sticky to the monitor, or it's orphaned.
-				if (
-					monitorIndices.Contains(monitorIndex)
-					|| monitorIndices.All(index => index < 0 || index >= monitors.Length)
-				)
+				bool isOrphaned = true;
+				bool isStickyToMonitor = false;
+				foreach (int index in monitorIndices)
+				{
+					if (index >= 0 && index < monitors.Length)
+					{
+						isOrphaned = false;
+						if (index == monitorIndex)
+						{
+							isStickyToMonitor = true;
+							break;
+						}
+					}
+				}
+
+				if (isStickyToMonitor || isOrphaned)
 				{
 					unsortedWorkspaces.Add(workspaceId);
 				}
