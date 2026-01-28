@@ -10,6 +10,9 @@
 	d:DesignWidth="800"
 	mc:Ignorable="d"
 >
+	<UserControl.Resources>
+		<local:BoolToUnderlineConverter x:Key="BoolToUnderlineConverter" />
+	</UserControl.Resources>
 	<ItemsControl ItemsSource="{x:Bind ViewModel.Workspaces}">
 		<ItemsControl.ItemsPanel>
 			<ItemsPanelTemplate>
@@ -21,9 +24,12 @@
 				<Button
 					Command="{x:Bind SwitchWorkspaceCommand}"
 					CommandParameter="{x:Bind}"
-					Content="{x:Bind Name}"
 					Style="{StaticResource bar:workspace:button}"
 				>
+					<TextBlock
+						Text="{x:Bind Name, Mode=OneWay}"
+						TextDecorations="{x:Bind HasWindows, Mode=OneWay, Converter={StaticResource BoolToUnderlineConverter}}"
+					/>
 					<Button.Resources>
 						<!--
 							WinUI doesn't let us set `Trigger` styles explicitly. We can

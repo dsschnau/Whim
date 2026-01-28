@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Corvus.Json;
+using Whim.Gaps;
 using Yaml2JsonNode;
 using YamlDotNet.RepresentationModel;
 
@@ -43,7 +44,136 @@ public static class YamlLoader
 		YamlPluginLoader.LoadPlugins(ctx, schema);
 		YamlLayoutEngineLoader.UpdateLayoutEngines(ctx, schema);
 
+		// Register the reload command
+		RegisterReloadCommand(ctx);
+
 		return true;
+	}
+
+	private static bool _reloadCommandRegistered;
+
+	private static void RegisterReloadCommand(IContext ctx)
+	{
+		if (_reloadCommandRegistered)
+		{
+			return;
+		}
+
+		ctx.CommandManager.Add(
+			identifier: "reload_yaml_config",
+			title: "Reload YAML configuration",
+			callback: () =>
+			{
+				bool success = Reload(ctx);
+				string message = success ? "YAML configuration reloaded" : "Failed to reload YAML configuration";
+				Logger.Information(message);
+			}
+		);
+
+		// Set default keybind: Win+Shift+R
+		ctx.KeybindManager.SetKeybind(
+			"whim.custom.reload_yaml_config",
+			new Keybind(IKeybind.WinShift, Windows.Win32.UI.Input.KeyboardAndMouse.VIRTUAL_KEY.VK_R)
+		);
+
+		_reloadCommandRegistered = true;
+	}
+
+	/// <summary>
+	/// Reloads the YAML configuration, updating layout engines and gaps.
+	/// Keybinds, filters, and routers from YAML are re-applied (overriding defaults).
+	/// This can be called at runtime without restarting the application.
+	/// </summary>
+	/// <param name="ctx">The <see cref="IContext"/> to operate on.</param>
+	/// <returns>
+	/// <see langword="true"/> if the reload succeeded; otherwise, <see langword="false"/>.
+	/// </returns>
+	public static bool Reload(IContext ctx)
+	{
+		if (Parse(ctx) is not Schema schema)
+		{
+			Logger.Error("Failed to parse YAML config during reload");
+			return false;
+		}
+
+		// Validate before making any changes
+		ValidationContext result = schema.Validate(ValidationContext.ValidContext, ValidationLevel.Detailed);
+		if (!result.IsValid)
+		{
+			ShowError(ctx, GetValidationErrors(result));
+			return false;
+		}
+
+		// Re-apply keybind overrides from YAML (don't clear - that would remove plugin defaults)
+		UpdateKeybinds(ctx, schema);
+
+		// Update Gaps plugin if loaded
+		ReloadGapsConfig(ctx, schema);
+
+		// Update layout engines and reload them on all workspaces
+		YamlLayoutEngineLoader.UpdateLayoutEngines(ctx, schema);
+		ctx.Store.Dispatch(new ReloadLayoutEnginesTransform());
+
+		return true;
+	}
+
+	private static void ReloadGapsConfig(IContext ctx, Schema schema)
+	{
+		if (ctx.PluginManager.LoadedPlugins.OfType<IGapsPlugin>().FirstOrDefault() is not IGapsPlugin gapsPlugin)
+		{
+			return;
+		}
+
+		if (schema.Plugins?.Gaps is not { } gapsSchema || !gapsSchema.IsValid())
+		{
+			return;
+		}
+
+		bool changed = false;
+
+		if (gapsSchema.OuterGap is { } outerGapValue)
+		{
+			int outerGap = (int)outerGapValue;
+			if (gapsPlugin.GapsConfig.OuterGap != outerGap)
+			{
+				gapsPlugin.GapsConfig.OuterGap = outerGap;
+				changed = true;
+			}
+		}
+
+		if (gapsSchema.InnerGap is { } innerGapValue)
+		{
+			int innerGap = (int)innerGapValue;
+			if (gapsPlugin.GapsConfig.InnerGap != innerGap)
+			{
+				gapsPlugin.GapsConfig.InnerGap = innerGap;
+				changed = true;
+			}
+		}
+
+		if (changed)
+		{
+			ctx.Store.Dispatch(new LayoutAllActiveWorkspacesTransform());
+		}
+	}
+
+	private static string GetValidationErrors(ValidationContext result)
+	{
+		StringBuilder sb = new();
+		int idx = 0;
+		foreach (ValidationResult error in result.Results)
+		{
+			if (error.Valid)
+			{
+				continue;
+			}
+
+			sb.AppendFormat("Error {0}:\n", idx + 1);
+			sb.AppendLine(error.Message);
+			sb.AppendFormat("Violated {0}\n", error.Location?.ValidationLocation.ToString() ?? "unknown schema");
+			idx += 1;
+		}
+		return sb.ToString();
 	}
 
 	private static Schema? Parse(IContext ctx)
@@ -83,21 +213,7 @@ public static class YamlLoader
 			return;
 		}
 
-		StringBuilder sb = new();
-		int idx = 0;
-		foreach (ValidationResult error in result.Results)
-		{
-			if (error.Valid)
-			{
-				continue;
-			}
-
-			sb.AppendFormat("Error {0}:\n", idx + 1);
-			sb.AppendLine(error.Message);
-			sb.AppendFormat("Violated {0}\n", error.Location?.ValidationLocation.ToString() ?? "unknown schema");
-			idx += 1;
-		}
-		string errors = sb.ToString();
+		string errors = GetValidationErrors(result);
 
 		Logger.Error("Configuration file is not valid.");
 		Logger.Error(errors);

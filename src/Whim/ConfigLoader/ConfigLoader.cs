@@ -101,6 +101,7 @@ internal class ConfigLoader(IFileManager fileManager)
 
 		// Evaluate the Whim config.
 		ScriptOptions options = ScriptOptions.Default;
+		// NOTE: If you get an exception bubbling up here, you may need to go to your installed whim.config.csx and point it at the compiled DLLs instead.
 		Task<DoConfig> task = CSharpScript.EvaluateAsync<DoConfig>(rawConfig, options);
 		return task.Result;
 	}

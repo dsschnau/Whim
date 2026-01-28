@@ -168,11 +168,40 @@
     "LayoutEngine": {
       "required": ["type"],
       "anyOf": [
+        { "$ref": "#/$defs/FibonacciLayoutEngine" },
         { "$ref": "#/$defs/FloatingWindowEngine" },
         { "$ref": "#/$defs/FocusLayoutEngine" },
         { "$ref": "#/$defs/SliceLayoutEngine" },
         { "$ref": "#/$defs/TreeLayoutEngine" }
       ]
+    },
+
+    "FibonacciLayoutEngine": {
+      "type": "object",
+      "description": "A layout engine that arranges windows in a Fibonacci spiral pattern",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "fibonacci" },
+        "reverse": {
+          "type": "boolean",
+          "description": "Whether the spiral should go counter-clockwise instead of clockwise. Only applies when mode is 'spiral'.",
+          "default": false
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["spiral", "ultrawide", "columns"],
+          "description": "The layout mode. 'spiral' is the classic Fibonacci pattern. 'ultrawide' places the first window on top and arranges remaining windows horizontally below - good for ultrawide monitors where windows would otherwise be too wide. 'columns' places the first window on the left and stacks remaining windows vertically on the right.",
+          "default": "spiral"
+        },
+        "split_ratio": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 0.9,
+          "description": "The ratio of space given to the first window in each split. Defaults to 0.5. Use higher values (0.6-0.7) to give more space to primary windows.",
+          "default": 0.5
+        }
+      }
     },
 
     "FloatingWindowEngine": {

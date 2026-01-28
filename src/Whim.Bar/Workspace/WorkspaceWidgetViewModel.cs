@@ -36,6 +36,7 @@ internal class WorkspaceWidgetViewModel : IDisposable
 		_context.Store.WorkspaceEvents.WorkspaceRemoved += WorkspaceEvents_WorkspaceRemoved;
 		_context.Store.MapEvents.MonitorWorkspaceChanged += MapEvents_MonitorWorkspaceChanged;
 		_context.Store.WorkspaceEvents.WorkspaceRenamed += WorkspaceEvents_WorkspaceRenamed;
+		_context.Store.MapEvents.WindowRouted += MapEvents_WindowRouted;
 
 		UpdateWorkspacesCollection();
 	}
@@ -89,6 +90,22 @@ internal class WorkspaceWidgetViewModel : IDisposable
 		workspace.Workspace_Renamed(sender, e);
 	}
 
+	private void MapEvents_WindowRouted(object? sender, RouteEventArgs e)
+	{
+		// Update HasWindows for both the previous and current workspace
+		if (e.PreviousWorkspace is { } previousWorkspace)
+		{
+			WorkspaceModel? prevModel = Workspaces.FirstOrDefault(m => m.Workspace.Id == previousWorkspace.Id);
+			prevModel?.OnWindowsChanged();
+		}
+
+		if (e.CurrentWorkspace is { } currentWorkspace)
+		{
+			WorkspaceModel? currModel = Workspaces.FirstOrDefault(m => m.Workspace.Id == currentWorkspace.Id);
+			currModel?.OnWindowsChanged();
+		}
+	}
+
 	/// <inheritdoc/>
 	protected virtual void Dispose(bool disposing)
 	{
@@ -101,6 +118,7 @@ internal class WorkspaceWidgetViewModel : IDisposable
 				_context.Store.WorkspaceEvents.WorkspaceRemoved -= WorkspaceEvents_WorkspaceRemoved;
 				_context.Store.MapEvents.MonitorWorkspaceChanged -= MapEvents_MonitorWorkspaceChanged;
 				_context.Store.WorkspaceEvents.WorkspaceRenamed -= WorkspaceEvents_WorkspaceRenamed;
+				_context.Store.MapEvents.WindowRouted -= MapEvents_WindowRouted;
 			}
 
 			// free unmanaged resources (unmanaged objects) and override finalizer

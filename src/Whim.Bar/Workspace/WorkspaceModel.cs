@@ -19,6 +19,12 @@ internal class WorkspaceModel : INotifyPropertyChanged
 	/// </summary>
 	public string? Name => _ctx.Store.Pick(Pickers.PickWorkspaceById(Workspace.Id)).ValueOrDefault?.Name;
 
+	/// <summary>
+	/// Whether the workspace has any windows.
+	/// </summary>
+	public bool HasWindows =>
+		_ctx.Store.Pick(Pickers.PickWorkspaceById(Workspace.Id)).ValueOrDefault?.WindowPositions.Count > 0;
+
 	private bool _activeonMonitor;
 
 	/// <summary>
@@ -71,5 +77,13 @@ internal class WorkspaceModel : INotifyPropertyChanged
 	internal void Workspace_Renamed(object? sender, WorkspaceRenamedEventArgs e)
 	{
 		OnPropertyChanged(nameof(Name));
+	}
+
+	/// <summary>
+	/// Triggered when windows are routed to/from the workspace.
+	/// </summary>
+	internal void OnWindowsChanged()
+	{
+		OnPropertyChanged(nameof(HasWindows));
 	}
 }

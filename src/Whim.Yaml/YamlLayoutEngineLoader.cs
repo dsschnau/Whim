@@ -1,3 +1,4 @@
+using Whim.FibonacciLayout;
 using Whim.FloatingWindow;
 using Whim.SliceLayout;
 using Whim.TreeLayout;
@@ -32,6 +33,11 @@ internal static class YamlLayoutEngineLoader
 		foreach (var engine in layoutEngines)
 		{
 			engine.Match<object?>(
+				(in Schema.FibonacciLayoutEngineEntity fibonacciLayoutEngine) =>
+				{
+					CreateFibonacciLayoutEngineCreator(ctx, leafLayoutEngineCreators, fibonacciLayoutEngine);
+					return null;
+				},
 				(in Schema.FloatingWindowEngineEntity floatingWindow) =>
 				{
 					CreateFloatingLayoutEngineCreator(ctx, leafLayoutEngineCreators);
@@ -57,6 +63,49 @@ internal static class YamlLayoutEngineLoader
 		}
 
 		return leafLayoutEngineCreators.Count == 0 ? null : [.. leafLayoutEngineCreators];
+	}
+
+	private static void CreateFibonacciLayoutEngineCreator(
+		IContext ctx,
+		List<CreateLeafLayoutEngine> leafLayoutEngineCreators,
+		Schema.FibonacciLayoutEngineEntity fibonacciLayoutEngine
+	)
+	{
+		if (
+			ctx.PluginManager.LoadedPlugins.FirstOrDefault(p => p.Name == "whim.fibonacci_layout")
+			is not FibonacciLayoutPlugin plugin
+		)
+		{
+			plugin = new(ctx);
+			ctx.PluginManager.AddPlugin(plugin);
+		}
+
+		bool reverse = fibonacciLayoutEngine.Reverse is { } r && r;
+		double splitRatio = fibonacciLayoutEngine.SplitRatio is { } sr ? sr : 0.5;
+		string? modeStr = (string?)fibonacciLayoutEngine.Mode;
+
+		FibonacciLayoutMode mode = modeStr switch
+		{
+			"ultrawide" => FibonacciLayoutMode.Ultrawide,
+			"columns" => FibonacciLayoutMode.Columns,
+			_ => FibonacciLayoutMode.Spiral,
+		};
+
+		leafLayoutEngineCreators.Add(
+			(id) =>
+				mode switch
+				{
+					FibonacciLayoutMode.Ultrawide => FibonacciLayouts.CreateUltrawideFibonacciLayout(
+						plugin,
+						id,
+						splitRatio
+					),
+					FibonacciLayoutMode.Columns => FibonacciLayouts.CreateColumnsFibonacciLayout(plugin, id, splitRatio),
+					_ => reverse
+						? FibonacciLayouts.CreateReverseFibonacciLayout(plugin, id, splitRatio)
+						: FibonacciLayouts.CreateFibonacciLayout(plugin, id, splitRatio),
+				}
+		);
 	}
 
 	private static void CreateFloatingLayoutEngineCreator(
