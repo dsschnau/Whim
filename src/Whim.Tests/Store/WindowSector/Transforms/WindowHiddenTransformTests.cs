@@ -69,4 +69,28 @@ public class WindowHiddenTransformTests
 		Assert.True(result.IsSuccessful);
 		Assert.Equal(window, ev.Arguments.Window);
 	}
+
+	[Theory, AutoSubstituteData<StoreCustomization>]
+	internal void MonitorsChanging_IgnoresHideEvent(IContext ctx, MutableRootSector rootSector)
+	{
+		// Given the window is inside the window sector and monitors are changing
+		IWindow window = CreateWindow((HWND)2);
+		IMonitor monitor = CreateMonitor((HMONITOR)3);
+
+		Workspace workspace = CreateWorkspace();
+		PopulateThreeWayMap(rootSector, monitor, workspace, window);
+
+		// Simulate monitors changing (e.g., during screen lock or undocking)
+		rootSector.MonitorSector.MonitorsChangingTasks = 1;
+
+		WindowHiddenTransform sut = new(window);
+
+		// When
+		var result = AssertDoesNotRaise(ctx, rootSector, sut);
+
+		// Then - the window should NOT be removed because monitors are changing
+		Assert.True(result.IsSuccessful);
+		Assert.True(rootSector.WindowSector.Windows.ContainsKey(window.Handle));
+		Assert.True(rootSector.MapSector.WindowWorkspaceMap.ContainsKey(window.Handle));
+	}
 }
